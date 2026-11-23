@@ -27,11 +27,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 struct TonicaApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @State private var model = AppModel()
+    @AppStorage("language") private var language = AppLanguage.russian.rawValue
 
     var body: some Scene {
         WindowGroup("Tonica") {
             ContentView()
                 .environment(model)
+                .environment(\.locale, Locale(identifier: language))
                 .frame(minWidth: 1040, minHeight: 640)
                 .onAppear {
                     AppDelegate.windowReady = true
@@ -46,12 +48,19 @@ struct TonicaApp: App {
         }
         .windowToolbarStyle(.unified)
         .commands {
+            CommandMenu(tr("Язык", "Language")) {
+                Picker(tr("Язык", "Language"), selection: $language) {
+                    ForEach(AppLanguage.allCases) { language in
+                        Text(language.title).tag(language.rawValue)
+                    }
+                }
+            }
             CommandGroup(replacing: .newItem) {
-                Button("Добавить файлы…") { model.openFilesPanel() }
+                Button(tr("Добавить файлы…", "Add Files…")) { model.openFilesPanel() }
                     .keyboardShortcut("o")
             }
             CommandGroup(after: .pasteboard) {
-                Button("Вставить обложку") { model.pasteCover(for: model.selectedTracks) }
+                Button(tr("Вставить обложку", "Paste Cover")) { model.pasteCover(for: model.selectedTracks) }
                     .keyboardShortcut("v", modifiers: [.command, .shift])
                     .disabled(model.selection.isEmpty)
             }

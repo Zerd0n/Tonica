@@ -20,7 +20,7 @@ struct CoverSearchView: View {
         VStack(spacing: 0) {
             HStack {
                 Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
-                TextField("Исполнитель, альбом или название трека", text: $query)
+                TextField(tr("Исполнитель, альбом или название трека", "Artist, album or track title"), text: $query)
                     .textFieldStyle(.roundedBorder)
                     .onSubmit(search)
                 Picker("", selection: $size) {
@@ -28,8 +28,8 @@ struct CoverSearchView: View {
                 }
                 .labelsHidden()
                 .frame(width: 120)
-                .help("Размер скачиваемой обложки")
-                Button("Искать", action: search)
+                .help(tr("Размер скачиваемой обложки", "Downloaded cover size"))
+                Button(tr("Искать", "Search"), action: search)
                     .keyboardShortcut(.defaultAction)
                     .disabled(query.trimmingCharacters(in: .whitespaces).isEmpty || searching)
             }
@@ -49,10 +49,10 @@ struct CoverSearchView: View {
                     .padding(16)
                 }
                 if searching {
-                    ProgressView("Ищу обложки…")
+                    ProgressView(tr("Ищу обложки…", "Searching for covers…"))
                 } else if searchedOnce && results.isEmpty {
-                    ContentUnavailableView("Ничего не найдено", systemImage: "photo.on.rectangle.angled",
-                                           description: Text("Попробуйте написать только исполнителя и альбом"))
+                    ContentUnavailableView(tr("Ничего не найдено", "No Results"), systemImage: "photo.on.rectangle.angled",
+                                           description: Text(tr("Попробуйте написать только исполнителя и альбом", "Try searching for just the artist and album")))
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -62,16 +62,16 @@ struct CoverSearchView: View {
             HStack {
                 if let error { Text(error).foregroundStyle(.red).lineLimit(2) }
                 else {
-                    Text(targets.count == 1 ? "Для: \(targets[0].title)" : "Для \(targets.count) треков")
+                    Text(targets.count == 1 ? tr("Для: \(targets[0].title)", "For: \(targets[0].title)") : tr("Для \(targets.count) треков", "For \(targets.count) tracks"))
                         .foregroundStyle(.secondary).lineLimit(1)
                 }
                 Spacer()
-                Button("Отмена") { dismiss() }.keyboardShortcut(.cancelAction)
+                Button(tr("Отмена", "Cancel")) { dismiss() }.keyboardShortcut(.cancelAction)
                 Button {
                     apply()
                 } label: {
                     if applying { ProgressView().controlSize(.small).padding(.horizontal, 20) }
-                    else { Text("Применить обложку") }
+                    else { Text(tr("Применить обложку", "Apply Cover")) }
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(selected == nil || applying)
@@ -123,7 +123,7 @@ struct CoverSearchView: View {
                     model.setCover(fallback, for: targets)
                     dismiss()
                 } else {
-                    self.error = "Не удалось скачать: \(error.localizedDescription)"
+                    self.error = tr("Не удалось скачать: \(error.localizedDescription)", "Download failed: \(error.localizedDescription)")
                 }
             }
             applying = false

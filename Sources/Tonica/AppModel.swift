@@ -68,7 +68,7 @@ final class AppModel {
         panel.allowsMultipleSelection = true
         panel.canChooseDirectories = true
         panel.allowedContentTypes = [.audio, .folder, .mpeg4Movie]
-        panel.message = "Выберите аудиофайлы или папки с музыкой"
+        panel.message = tr("Выберите аудиофайлы или папки с музыкой", "Choose audio files or folders containing music")
         if panel.runModal() == .OK { add(urls: panel.urls) }
     }
 
@@ -89,7 +89,7 @@ final class AppModel {
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
         panel.canCreateDirectories = true
-        panel.prompt = "Выбрать"
+        panel.prompt = tr("Выбрать", "Choose")
         if panel.runModal() == .OK, let url = panel.url {
             settings.outputFolder = url
             settings.location = .customFolder
@@ -113,7 +113,7 @@ final class AppModel {
     func chooseCoverFile(for targets: [Track]) {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.image]
-        panel.message = "Выберите изображение для обложки"
+        panel.message = tr("Выберите изображение для обложки", "Choose an image for the cover")
         guard panel.runModal() == .OK, let url = panel.url, let data = try? Data(contentsOf: url) else { return }
         setCover(imageData: data, for: targets)
     }
@@ -126,7 +126,7 @@ final class AppModel {
                   let data = try? Data(contentsOf: url) {
             setCover(imageData: data, for: targets)
         } else {
-            alertMessage = "В буфере обмена нет изображения"
+            alertMessage = tr("В буфере обмена нет изображения", "There is no image on the clipboard")
         }
     }
 
@@ -186,7 +186,7 @@ final class AppModel {
     func convertAll() {
         let queue = (selection.isEmpty ? tracks : selectedTracks).filter {
             if case .loading = $0.status { return false }
-            if case .failed(let msg) = $0.status, msg.hasPrefix("В файле нет") || msg.hasPrefix("Не удалось прочитать") { return false }
+            if case .failed(let msg) = $0.status, msg.hasPrefix("В файле нет") || msg.hasPrefix("Не удалось прочитать") || msg.hasPrefix("The file has no audio stream") || msg.hasPrefix("Could not read file") { return false }
             return true
         }
         guard !queue.isEmpty, !isConverting else { return }

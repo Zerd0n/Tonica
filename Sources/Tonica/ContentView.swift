@@ -21,19 +21,19 @@ struct ContentView: View {
         }
         .toolbar {
             ToolbarItemGroup {
-                Button { model.openFilesPanel() } label: { Label("Добавить", systemImage: "plus") }
-                    .help("Добавить файлы или папки (⌘O)")
-                Button { model.removeSelected() } label: { Label("Убрать", systemImage: "minus") }
+                Button { model.openFilesPanel() } label: { Label(tr("Добавить", "Add"), systemImage: "plus") }
+                    .help(tr("Добавить файлы или папки (⌘O)", "Add files or folders (⌘O)"))
+                Button { model.removeSelected() } label: { Label(tr("Убрать", "Remove"), systemImage: "minus") }
                     .disabled(model.selection.isEmpty || model.isConverting)
-                    .help("Убрать выбранные из списка")
-                Button { model.removeAll() } label: { Label("Очистить", systemImage: "trash") }
+                    .help(tr("Убрать выбранные из списка", "Remove selected tracks"))
+                Button { model.removeAll() } label: { Label(tr("Очистить", "Clear"), systemImage: "trash") }
                     .disabled(model.tracks.isEmpty || model.isConverting)
-                    .help("Очистить список")
+                    .help(tr("Очистить список", "Clear the list"))
                 Button { coverSearchTargets = model.selectedTracks } label: {
-                    Label("Найти обложку", systemImage: "photo.badge.magnifyingglass")
+                    Label(tr("Найти обложку", "Find Cover"), systemImage: "photo.badge.magnifyingglass")
                 }
                 .disabled(model.selection.isEmpty)
-                .help("Найти обложку в интернете для выбранных треков")
+                .help(tr("Найти обложку в интернете для выбранных треков", "Find cover art online for selected tracks"))
             }
         }
         .sheet(item: Binding(
@@ -57,37 +57,37 @@ struct ContentView: View {
                     CoverThumb(image: t.coverImage, size: 34)
                 }
                 .width(42)
-                TableColumn("Название") { t in
+                TableColumn(tr("Название", "Title")) { t in
                     VStack(alignment: .leading, spacing: 1) {
                         Text(t.title).lineLimit(1)
                         Text(t.fileName).font(.caption).foregroundStyle(.secondary).lineLimit(1)
                     }
                 }
                 .width(min: 160, ideal: 240)
-                TableColumn("Исполнитель") { t in Text(t.artist).lineLimit(1) }
+                TableColumn(tr("Исполнитель", "Artist")) { t in Text(t.artist).lineLimit(1) }
                     .width(min: 80, ideal: 140)
-                TableColumn("Формат") { t in
+                TableColumn(tr("Формат", "Format")) { t in
                     Text(t.status == .loading ? "…" : t.formatDescription)
                         .font(.callout.monospacedDigit()).foregroundStyle(.secondary).lineLimit(1)
                 }
                 .width(min: 110, ideal: 170)
-                TableColumn("Время") { t in
+                TableColumn(tr("Время", "Duration")) { t in
                     Text(t.durationText).font(.callout.monospacedDigit()).foregroundStyle(.secondary)
                 }
                 .width(52)
-                TableColumn("Статус") { t in StatusCell(track: t) }
+                TableColumn(tr("Статус", "Status")) { t in StatusCell(track: t) }
                     .width(min: 90, ideal: 120)
             }
             .contextMenu(forSelectionType: Track.ID.self) { ids in
                 let targets = model.tracks.filter { ids.contains($0.id) }
-                Button("Найти обложку…") { coverSearchTargets = targets }
-                Button("Выбрать обложку из файла…") { model.chooseCoverFile(for: targets) }
-                Button("Вставить обложку из буфера") { model.pasteCover(for: targets) }
-                Button("Убрать обложку") { model.removeCover(for: targets) }
+                Button(tr("Найти обложку…", "Find Cover…")) { coverSearchTargets = targets }
+                Button(tr("Выбрать обложку из файла…", "Choose Cover File…")) { model.chooseCoverFile(for: targets) }
+                Button(tr("Вставить обложку из буфера", "Paste Cover from Clipboard")) { model.pasteCover(for: targets) }
+                Button(tr("Убрать обложку", "Remove Cover")) { model.removeCover(for: targets) }
                 Divider()
-                Button("Записать обложку и теги в файл") { model.writeInPlace(targets) }
+                Button(tr("Записать обложку и теги в файл", "Write Cover and Tags to File")) { model.writeInPlace(targets) }
                 Divider()
-                Button("Показать в Finder") {
+                Button(tr("Показать в Finder", "Show in Finder")) {
                     NSWorkspace.shared.activateFileViewerSelecting(targets.map { $0.outputURL ?? $0.url })
                 }
             }
@@ -97,11 +97,11 @@ struct ContentView: View {
                     Image(systemName: "waveform.badge.plus")
                         .font(.system(size: 56, weight: .light))
                         .foregroundStyle(.secondary)
-                    Text("Перетащите сюда музыку или папки")
+                    Text(tr("Перетащите сюда музыку или папки", "Drop music or folders here"))
                         .font(.title3)
-                    Text("MP3, M4A, FLAC, ALAC, WAV, AIFF, OGG, Opus и другие")
+                    Text(tr("MP3, M4A, FLAC, ALAC, WAV, AIFF, OGG, Opus и другие", "MP3, M4A, FLAC, ALAC, WAV, AIFF, OGG, Opus and more"))
                         .foregroundStyle(.secondary)
-                    Button("Выбрать файлы…") { model.openFilesPanel() }
+                    Button(tr("Выбрать файлы…", "Choose Files…")) { model.openFilesPanel() }
                         .controlSize(.large)
                 }
                 .allowsHitTesting(true)
@@ -174,16 +174,16 @@ struct StatusCell: View {
             ProgressView().controlSize(.small)
         case .ready:
             if track.hasPendingCoverChange {
-                Label("Новая обложка", systemImage: "photo").foregroundStyle(.blue).font(.callout)
+                Label(tr("Новая обложка", "New Cover"), systemImage: "photo").foregroundStyle(.blue).font(.callout)
             } else {
-                Text("Готов").foregroundStyle(.secondary)
+                Text(tr("Готов", "Ready")).foregroundStyle(.secondary)
             }
         case .converting:
             ProgressView(value: track.progress).progressViewStyle(.linear)
         case .done:
-            Label("Готово", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+            Label(tr("Готово", "Done"), systemImage: "checkmark.circle.fill").foregroundStyle(.green)
         case .failed(let msg):
-            Label("Ошибка", systemImage: "exclamationmark.triangle.fill")
+            Label(tr("Ошибка", "Error"), systemImage: "exclamationmark.triangle.fill")
                 .foregroundStyle(.red)
                 .help(msg)
         }
@@ -198,16 +198,16 @@ struct FFmpegMissingBanner: View {
         HStack(spacing: 12) {
             Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange).font(.title2)
             VStack(alignment: .leading, spacing: 2) {
-                Text("Не найден ffmpeg — без него конвертация не работает").bold()
-                Text("Установите его в Терминале командой  \(Text(command).font(.body.monospaced()))  (нужен Homebrew: brew.sh)")
+                Text(tr("Не найден ffmpeg — без него конвертация не работает", "ffmpeg was not found — conversion is unavailable")).bold()
+                Text(tr("Установите ffmpeg в Терминале командой: ", "Install ffmpeg in Terminal: ")) + Text(command).font(.body.monospaced()) + Text(tr(" (нужен Homebrew: brew.sh)", " (requires Homebrew: brew.sh)"))
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Button("Скопировать команду") {
+            Button(tr("Скопировать команду", "Copy Command")) {
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(command, forType: .string)
             }
-            Button("Проверить снова") { model.recheckFFmpeg() }
+            Button(tr("Проверить снова", "Check Again")) { model.recheckFFmpeg() }
         }
         .padding(12)
         .background(.orange.opacity(0.12))

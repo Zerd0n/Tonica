@@ -13,7 +13,7 @@ struct InspectorView: View {
                 if targets.isEmpty {
                     VStack(spacing: 10) {
                         Image(systemName: "sidebar.right").font(.system(size: 36, weight: .light))
-                        Text("Выберите трек, чтобы изменить обложку и теги")
+                        Text(tr("Выберите трек, чтобы изменить обложку и теги", "Select a track to edit its cover and tags"))
                             .multilineTextAlignment(.center)
                     }
                     .foregroundStyle(.secondary)
@@ -25,17 +25,17 @@ struct InspectorView: View {
                         TagEditor(track: t)
                         infoSection(t)
                     } else {
-                        Text("Выбрано треков: \(targets.count). Обложка будет применена ко всем.")
+                        Text(tr("Выбрано треков: \(targets.count). Обложка будет применена ко всем.", "Selected tracks: \(targets.count). The cover will be applied to all."))
                             .foregroundStyle(.secondary)
                     }
                     Button {
                         model.writeInPlace(targets)
                     } label: {
-                        Label("Записать в исходный файл", systemImage: "square.and.arrow.down")
+                        Label(tr("Записать в исходный файл", "Write to Original File"), systemImage: "square.and.arrow.down")
                             .frame(maxWidth: .infinity)
                     }
                     .disabled(model.isConverting)
-                    .help("Сохранить обложку и теги в сам файл, без конвертации")
+                    .help(tr("Сохранить обложку и теги в сам файл, без конвертации", "Save cover and tags to the original file without conversion"))
                 }
             }
             .padding(16)
@@ -59,10 +59,10 @@ struct InspectorView: View {
         .onDrop(of: [.image, .fileURL], isTargeted: $coverDropTargeted) { providers in
             handleImageDrop(providers, targets: targets)
         }
-        .help("Перетащите сюда картинку, чтобы сделать её обложкой")
+        .help(tr("Перетащите сюда картинку, чтобы сделать её обложкой", "Drop an image here to use it as the cover"))
         .contextMenu {
             if let t = targets.first, t.effectiveCoverURL != nil {
-                Button("Сохранить картинку как…") { model.saveCoverImage(of: t) }
+                Button(tr("Сохранить картинку как…", "Save Image As…")) { model.saveCoverImage(of: t) }
             }
         }
 
@@ -73,17 +73,17 @@ struct InspectorView: View {
         }
 
         Button { onSearchCover(targets) } label: {
-            Label("Найти обложку в интернете", systemImage: "magnifyingglass").frame(maxWidth: .infinity)
+            Label(tr("Найти обложку в интернете", "Find Cover Online"), systemImage: "magnifyingglass").frame(maxWidth: .infinity)
         }
         .buttonStyle(.borderedProminent)
         .controlSize(.large)
 
         HStack {
-            Button { model.chooseCoverFile(for: targets) } label: { Label("Файл…", systemImage: "folder") }
-            Button { model.pasteCover(for: targets) } label: { Label("Вставить", systemImage: "doc.on.clipboard") }
+            Button { model.chooseCoverFile(for: targets) } label: { Label(tr("Файл…", "File…"), systemImage: "folder") }
+            Button { model.pasteCover(for: targets) } label: { Label(tr("Вставить", "Paste"), systemImage: "doc.on.clipboard") }
             Menu {
-                Button("Убрать обложку") { model.removeCover(for: targets) }
-                Button("Вернуть исходную") { model.revertCover(for: targets) }
+                Button(tr("Убрать обложку", "Remove Cover")) { model.removeCover(for: targets) }
+                Button(tr("Вернуть исходную", "Restore Original")) { model.revertCover(for: targets) }
             } label: { Image(systemName: "ellipsis.circle") }
                 .menuStyle(.borderlessButton)
                 .fixedSize()
@@ -109,17 +109,17 @@ struct InspectorView: View {
 
     private func infoSection(_ t: Track) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Файл").font(.headline)
+            Text(tr("Файл", "File")).font(.headline)
             Text(t.url.path).font(.caption).foregroundStyle(.secondary).textSelection(.enabled)
             if t.status != .loading {
-                Text(t.formatDescription + (t.channels > 0 ? " · \(t.channels == 1 ? "моно" : t.channels == 2 ? "стерео" : "\(t.channels) кан.")" : ""))
+                Text(t.formatDescription + (t.channels > 0 ? " · \(t.channels == 1 ? tr("моно", "mono") : t.channels == 2 ? tr("стерео", "stereo") : "\(t.channels) \(tr("кан.", "ch."))")" : ""))
                     .font(.caption).foregroundStyle(.secondary)
             }
             if case .failed(let msg) = t.status {
                 Text(msg).font(.caption).foregroundStyle(.red).textSelection(.enabled)
             }
             if let out = t.outputURL {
-                Button("Показать результат в Finder") { NSWorkspace.shared.activateFileViewerSelecting([out]) }
+                Button(tr("Показать результат в Finder", "Show Result in Finder")) { NSWorkspace.shared.activateFileViewerSelecting([out]) }
                     .buttonStyle(.link).font(.caption)
             }
         }
@@ -131,12 +131,12 @@ struct TagEditor: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Теги").font(.headline)
-            LabeledField("Название", text: $track.title)
-            LabeledField("Исполнитель", text: $track.artist)
-            LabeledField("Альбом", text: $track.album)
+            Text(tr("Теги", "Tags")).font(.headline)
+            LabeledField(tr("Название", "Title"), text: $track.title)
+            LabeledField(tr("Исполнитель", "Artist"), text: $track.artist)
+            LabeledField(tr("Альбом", "Album"), text: $track.album)
             if let year = track.extraTags["date"] ?? track.extraTags["year"] {
-                Text("Год: \(year)").font(.caption).foregroundStyle(.secondary)
+                Text(tr("Год: \(year)", "Year: \(year)")).font(.caption).foregroundStyle(.secondary)
             }
         }
     }

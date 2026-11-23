@@ -16,7 +16,7 @@ enum CoverSize: Int, CaseIterable, Identifiable {
         switch self {
         case .medium: "600 px"
         case .large: "1200 px"
-        case .max: "Максимум"
+        case .max: tr("Максимум", "Maximum")
         }
     }
 }
@@ -103,7 +103,7 @@ enum CoverSearch {
         req.setValue("Tonica/1.0", forHTTPHeaderField: "User-Agent")
         let (data, response) = try await URLSession.shared.data(for: req)
         if let http = response as? HTTPURLResponse, http.statusCode != 200 {
-            throw FFmpegError(message: "Сервер вернул код \(http.statusCode)")
+            throw FFmpegError(message: tr("Сервер вернул код \(http.statusCode)", "Server returned status \(http.statusCode)"))
         }
         return try TempFiles.storeImage(data: data)
     }

@@ -14,6 +14,7 @@ Music converter for macOS. Converts tracks between formats, adds cover art and c
 - Cover art: from a file, the clipboard, drag and drop, or search (Apple Music and Deezer), up to 3000×3000
 - Tag editing (title, artist, album)
 - Write cover art and tags into the original file without re-encoding
+- Russian and English interface; choose a language in the Language menu
 
 ### Installation
 
@@ -44,6 +45,7 @@ brew install ffmpeg
 - Обложки: из файла, из буфера обмена, перетаскиванием или поиском (Apple Music и Deezer), до 3000×3000
 - Редактирование тегов (название, исполнитель, альбом)
 - Запись обложки и тегов в исходный файл без перекодирования
+- Русский и английский интерфейс; язык выбирается в меню «Язык»
 
 ### Установка
 

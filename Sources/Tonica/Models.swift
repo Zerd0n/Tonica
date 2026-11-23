@@ -147,12 +147,12 @@ final class Track: Identifiable {
         var parts = [codec.hasPrefix("pcm_") ? "PCM" : codec.uppercased()]
         if sampleRate > 0 {
             let khz = Double(sampleRate) / 1000
-            parts.append(khz.truncatingRemainder(dividingBy: 1) == 0 ? "\(Int(khz)) кГц" : String(format: "%.1f кГц", khz))
+            parts.append(khz.truncatingRemainder(dividingBy: 1) == 0 ? "\(Int(khz)) \(tr("кГц", "kHz"))" : String(format: "%.1f %@", khz, tr("кГц", "kHz")))
         }
         if isLosslessSource, bitsPerSample > 0 {
-            parts.append("\(bitsPerSample) бит")
+            parts.append("\(bitsPerSample) \(tr("бит", "bit"))")
         } else if bitrate > 0 {
-            parts.append("\(bitrate / 1000) кбит/с")
+            parts.append("\(bitrate / 1000) \(tr("кбит/с", "kbps"))")
         }
         return parts.joined(separator: " · ")
     }

@@ -110,23 +110,23 @@ enum FFmpeg {
 
     static func lastErrorLine(_ stderr: String) -> String {
         let lines = stderr.split(separator: "\n").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
-        return lines.last ?? "неизвестная ошибка ffmpeg"
+        return lines.last ?? tr("неизвестная ошибка ffmpeg", "unknown ffmpeg error")
     }
 
     // MARK: Анализ файла
 
     static func probe(_ track: Track) async throws {
-        guard let probe = ffprobePath else { throw FFmpegError(message: "ffprobe не найден") }
+        guard let probe = ffprobePath else { throw FFmpegError(message: tr("ffprobe не найден", "ffprobe was not found")) }
         let r = try await run(probe, ["-v", "error", "-print_format", "json", "-show_format", "-show_streams", track.url.path])
         guard r.status == 0,
               let json = try JSONSerialization.jsonObject(with: r.stdout) as? [String: Any] else {
-            throw FFmpegError(message: "Не удалось прочитать файл: \(lastErrorLine(r.stderr))")
+            throw FFmpegError(message: tr("Не удалось прочитать файл: \(lastErrorLine(r.stderr))", "Could not read file: \(lastErrorLine(r.stderr))"))
         }
         let format = json["format"] as? [String: Any] ?? [:]
         let streams = json["streams"] as? [[String: Any]] ?? []
 
         guard let audio = streams.first(where: { $0["codec_type"] as? String == "audio" }) else {
-            throw FFmpegError(message: "В файле нет аудиодорожки")
+            throw FFmpegError(message: tr("В файле нет аудиодорожки", "The file has no audio stream"))
         }
 
         var tagDict: [String: String] = [:]
@@ -173,7 +173,7 @@ enum FFmpeg {
     }
 
     static func extractCover(from url: URL, streamIndex: Int, codec: String) async throws -> URL {
-        guard let ff = ffmpegPath else { throw FFmpegError(message: "ffmpeg не найден") }
+        guard let ff = ffmpegPath else { throw FFmpegError(message: tr("ffmpeg не найден", "ffmpeg was not found")) }
         let ext = codec == "png" ? "png" : "jpg"
         let out = TempFiles.newURL(ext: ext)
         var args = ["-v", "error", "-y", "-i", url.path, "-map", "0:\(streamIndex)", "-frames:v", "1"]
@@ -190,7 +190,7 @@ enum FFmpeg {
 
     static func convert(_ track: Track, settings s: ConversionSettings, to output: URL,
                         progress: @escaping (Double) -> Void) async throws {
-        guard let ff = ffmpegPath else { throw FFmpegError(message: "ffmpeg не найден") }
+        guard let ff = ffmpegPath else { throw FFmpegError(message: tr("ffmpeg не найден", "ffmpeg was not found")) }
         let fmt = s.format
 
         let snapshot = await MainActor.run {
@@ -254,19 +254,19 @@ enum FFmpeg {
         }
         if r.status != 0 {
             try? FileManager.default.removeItem(at: output)
-            throw FFmpegError(message: r.status == 15 ? "Остановлено" : lastErrorLine(r.stderr))
+            throw FFmpegError(message: r.status == 15 ? tr("Остановлено", "Stopped") : lastErrorLine(r.stderr))
         }
     }
 
     static func writeInPlace(_ track: Track) async throws {
-        guard let ff = ffmpegPath else { throw FFmpegError(message: "ffmpeg не найден") }
+        guard let ff = ffmpegPath else { throw FFmpegError(message: tr("ffmpeg не найден", "ffmpeg was not found")) }
         let ext = track.url.pathExtension.lowercased()
         let snapshot = await MainActor.run {
             (cover: track.effectiveCoverURL, tags: track.extraTags, title: track.title, artist: track.artist, album: track.album)
         }
         let canCover = coverCapableExtensions.contains(ext)
         if snapshot.cover != nil, !canCover {
-            throw FFmpegError(message: "Формат .\(ext) не поддерживает обложки — сконвертируйте в MP3, M4A или FLAC")
+            throw FFmpegError(message: tr("Формат .\(ext) не поддерживает обложки — сконвертируйте в MP3, M4A или FLAC", "The .\(ext) format does not support cover art — convert to MP3, M4A or FLAC"))
         }
 
         let tmp = track.url.deletingLastPathComponent()
@@ -311,14 +311,14 @@ enum TempFiles {
         if bytes.starts(with: [0x89, 0x50, 0x4E, 0x47]) {
             let url = newURL(ext: "png"); try data.write(to: url); return url
         }
-        guard let image = NSImage(data: data) else { throw FFmpegError(message: "Не удалось открыть изображение") }
+        guard let image = NSImage(data: data) else { throw FFmpegError(message: tr("Не удалось открыть изображение", "Could not open the image")) }
         return try storeImage(image)
     }
 
     static func storeImage(_ image: NSImage) throws -> URL {
         guard let tiff = image.tiffRepresentation, let rep = NSBitmapImageRep(data: tiff),
               let jpeg = rep.representation(using: .jpeg, properties: [.compressionFactor: 0.92]) else {
-            throw FFmpegError(message: "Не удалось преобразовать изображение")
+            throw FFmpegError(message: tr("Не удалось преобразовать изображение", "Could not convert the image"))
         }
         let url = newURL(ext: "jpg")
         try jpeg.write(to: url)
