@@ -18,7 +18,7 @@ Music converter for macOS. Converts tracks between formats, adds cover art and c
 
 ### Installation
 
-Download `Tonica-1.0.dmg` from [Releases](../../releases), open it and drag Tonica to Applications.
+Download `Tonica-1.1.dmg` from [Releases](../../releases), open it and drag Tonica to Applications.
 
 The app isn't signed with an Apple developer certificate, so macOS may block it on first launch. In that case right-click Tonica → Open, or go to System Settings → Privacy & Security → Open Anyway.
 
@@ -49,7 +49,7 @@ brew install ffmpeg
 
 ### Установка
 
-Скачать `Tonica-1.0.dmg` из [Releases](../../releases), открыть и перетащить Tonica в «Программы».
+Скачать `Tonica-1.1.dmg` из [Releases](../../releases), открыть и перетащить Tonica в «Программы».
 
 Приложение не подписано сертификатом Apple, поэтому при первом запуске macOS может его заблокировать. Тогда: правый клик по Tonica → «Открыть», либо Системные настройки → Конфиденциальность и безопасность → «Всё равно открыть».
 

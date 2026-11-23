@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 ROOT=$PWD
 APP_NAME=Tonica
-VERSION=1.0
+VERSION=1.1
 DIST=$ROOT/dist
 BUILD=$ROOT/.build/package
 APP=$BUILD/$APP_NAME.app
