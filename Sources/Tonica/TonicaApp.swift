@@ -32,6 +32,7 @@ struct TonicaApp: App {
     var body: some Scene {
         WindowGroup("Tonica") {
             ContentView()
+                .id(language)
                 .environment(model)
                 .environment(\.locale, Locale(identifier: language))
                 .frame(minWidth: 1040, minHeight: 640)
