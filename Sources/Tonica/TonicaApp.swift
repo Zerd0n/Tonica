@@ -37,11 +37,18 @@ struct TonicaApp: App {
                 .environment(\.locale, Locale(identifier: language))
                 .frame(minWidth: 1040, minHeight: 640)
                 .onAppear {
+                    DispatchQueue.main.async { SystemMenuLocalization.update() }
                     AppDelegate.windowReady = true
                     if !AppDelegate.pendingURLs.isEmpty {
                         model.add(urls: AppDelegate.pendingURLs)
                         AppDelegate.pendingURLs = []
                     }
+                }
+                .onChange(of: language) { _, _ in
+                    DispatchQueue.main.async { SystemMenuLocalization.update() }
+                }
+                .onReceive(NotificationCenter.default.publisher(for: NSMenu.didBeginTrackingNotification)) { _ in
+                    SystemMenuLocalization.update()
                 }
                 .onReceive(NotificationCenter.default.publisher(for: .tonicaOpenFiles)) { note in
                     if let urls = note.object as? [URL] { model.add(urls: urls) }
